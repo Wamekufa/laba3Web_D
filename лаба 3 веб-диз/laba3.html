@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лабораторная работа №3 - User Flow диаграммы</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: #2c3e50;
+            margin: 15px 0 10px;
+        }
+        
+        .flow-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .flow-btn {
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .flow-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .flow-btn.active {
+            background: #2c3e50;
+        }
+        
+        .flow-diagram {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 400px;
+            position: relative;
+        }
+        
+        .flow-step {
+            position: absolute;
+            width: 140px;
+            padding: 15px;
+            background: #3498db;
+            color: white;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .flow-step:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .flow-step.start {
+            background: #2ecc71;
+        }
+        
+        .flow-step.end {
+            background: #e74c3c;
+        }
+        
+        .flow-step.decision {
+            background: #f39c12;
+            width: 160px;
+        }
+        
+        .flow-arrow {
+            position: absolute;
+            height: 2px;
+            background: #3498db;
+            transform-origin: left center;
+        }
+        
+        .flow-arrow:after {
+            content: '';
+            position: absolute;
+            right: -8px;
+            top: -4px;
+            border: 5px solid transparent;
+            border-left-color: #3498db;
+        }
+        
+        .step-info {
+            background: #e8f4fd;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin: 15px 0;
+        }
+        
+        .analysis-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .analysis-section {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .analysis-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .improvement-list {
+            list-style-type: none;
+        }
+        
+        .improvement-list li {
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #2ecc71;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #2c3e50;
+            color: white;
+            margin-top: 30px;
+        }
+        
+        .conclusion {
+            background: #e8f4fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Лабораторная работа №3</h1>
+            <p class="subtitle">User Flow диаграммы сайта</p>
+        </header>
+        
+        <div class="content">
+            <div class="card">
+                <h2>Анализ User Flow</h2>
+                
+                <div class="flow-controls">
+                    <button class="flow-btn active" onclick="showFlow('purchase')">Покупка товара</button>
+                    <button class="flow-btn" onclick="showFlow('registration')">Регистрация</button>
+                    <button class="flow-btn" onclick="showFlow('search')">Поиск товара</button>
+                </div>
+                
+                <div class="flow-diagram" id="flowDiagram">
+                    <!-- Диаграмма будет отрисована JavaScript -->
+                </div>
+                
+                <div class="step-info" id="stepInfo">
+                    Выберите сценарий для просмотра User Flow диаграммы
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="stepsCount">0</div>
+                        <div class="stat-label">Шагов</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="timeCount">0</div>
+                        <div class="stat-label">Минут</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="clicksCount">0</div>
+                        <div class="stat-label">Кликов</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="decisionsCount">0</div>
+                        <div class="stat-label">Выборов</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Отчет по анализу</h2>
+                
+                <h3>Выбранный веб-сайт: Интернет-магазин электроники</h3>
+                <p>Сайт предлагает широкий ассортимент электронных товаров с функциями поиска, фильтрации и онлайн-покупки.</p>
+                
+                <div class="conclusion">
+                    <h3>Целевое действие: Покупка товара</h3>
+                    <p>Пользователь должен найти нужный товар, добавить его в корзину и завершить оформление заказа.</p>
+                </div>
+                
+                <div class="analysis-section">
+                    <div class="analysis-card">
+                        <h3>Ключевые этапы</h3>
+                        <ul class="improvement-list">
+                            <li>Поиск и навигация по категориям</li>
+                            <li>Просмотр карточки товара</li>
+                            <li>Добавление в корзину</li>
+                            <li>Оформление заказа</li>
+                            <li>Подтверждение покупки</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="analysis-card">
+                        <h3>Возможные проблемы</h3>
+                        <ul class="improvement-list">
+                            <li>Сложная навигация между категориями</li>
+                            <li>Длинная форма оформления заказа</li>
+                            <li>Неочевидный процесс поиска</li>
+                            <li>Отсутствие гостевой покупки</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="conclusion">
+                    <h3>Рекомендации по улучшению</h3>
+                    <ul class="improvement-list">
+                        <li>Упростить процесс оформления заказа (убрать обязательную регистрацию)</li>
+                        <li>Добавить быстрый поиск с автодополнением</li>
+                        <li>Улучшить фильтрацию товаров по характеристикам</li>
+                        <li>Сократить количество шагов до покупки</li>
+                        <li>Добавить прогресс-бар процесса покупки</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Частное учреждение образования «Гродненский колледж бизнеса и права»</p>
+            <p>Лабораторная работа №3 по теме: «User Flow диаграммы сайта»</p>
+        </footer>
+    </div>
+
+    <script>
+        // Данные для различных User Flow сценариев
+        const flowData = {
+            purchase: {
+                steps: [
+                    { id: 1, name: "Главная страница", type: "start", x: 50, y: 50, info: "Пользователь заходит на главную страницу интернет-магазина" },
+                    { id: 2, name: "Поиск товара", type: "normal", x: 250, y: 50, info: "Использует поиск или навигацию по категориям для поиска нужного товара" },
+                    { id: 3, name: "Выбор товара", type: "normal", x: 450, y: 50, info: "Просматривает результаты поиска и выбирает подходящий товар" },
+                    { id: 4, name: "Карточка товара", type: "normal", x: 650, y: 50, info: "Изучает описание, характеристики, отзывы и цену товара" },
+                    { id: 5, name: "Добавить в корзину", type: "decision", x: 450, y: 150, info: "Принимает решение о покупке и добавляет товар в корзину" },
+                    { id: 6, name: "Корзина", type: "normal", x: 250, y: 150, info: "Проверяет состав заказа, количество товаров и общую стоимость" },
+                    { id: 7, name: "Оформление заказа", type: "normal", x: 50, y: 250, info: "Заполняет данные для доставки и выбирает способ оплаты" },
+                    { id: 8, name: "Подтверждение", type: "end", x: 250, y: 250, info: "Подтверждает заказ и получает номер для отслеживания" }
+                ],
+                connections: [
+                    { from: 1, to: 2 },
+                    { from: 2, to: 3 },
+                    { from: 3, to: 4 },
+                    { from: 4, to: 5 },
+                    { from: 5, to: 6, label: "Купить" },
+                    { from: 5, to: 2, label: "Продолжить поиск" },
+                    { from: 6, to: 7 },
+                    { from: 7, to: 8 }
+                ],
+                stats: { steps: 8, time: 5, clicks: 12, decisions: 2 }
+            },
+            registration: {
+                steps: [
+                    { id: 1, name: "Главная страница", type: "start", x: 50, y: 50, info: "Пользователь заходит на сайт" },
+                    { id: 2, name: "Клик 'Регистрация'", type: "normal", x: 250, y: 50, info: "Нажимает кнопку регистрации в верхнем меню" },
+                    { id: 3, name: "Форма регистрации", type: "normal", x: 450, y: 50, info: "Заполняет обязательные поля: email, пароль, имя" },
+                    { id: 4, name: "Подтверждение email", type: "decision", x: 650, y: 50, info: "Система отправляет письмо для подтверждения email" },
+                    { id: 5, name: "Email подтвержден", type: "normal", x: 650, y: 150, info: "Пользователь подтверждает email по ссылке из письма" },
+                    { id: 6, name: "Личный кабинет", type: "end", x: 450, y: 150, info: "Регистрация завершена, открывается личный кабинет" },
+                    { id: 7, name: "Повторная отправка", type: "normal", x: 450, y: 250, info: "Система предлагает повторно отправить письмо подтверждения" }
+                ],
+                connections: [
+                    { from: 1, to: 2 },
+                    { from: 2, to: 3 },
+                    { from: 3, to: 4 },
+                    { from: 4, to: 5, label: "Подтвердить" },
+                    { from: 4, to: 7, label: "Не пришло письмо" },
+                    { from: 5, to: 6 },
+                    { from: 7, to: 4 }
+                ],
+                stats: { steps: 7, time: 3, clicks: 8, decisions: 1 }
+            },
+            search: {
+                steps: [
+                    { id: 1, name: "Главная страница", type: "start", x: 50, y: 50, info: "Пользователь заходит на сайт с целью найти конкретный товар" },
+                    { id: 2, name: "Ввод запроса", type: "normal", x: 250, y: 50, info: "Вводит поисковый запрос в строку поиска" },
+                    { id: 3, name: "Результаты поиска", type: "normal", x: 450, y: 50, info: "Просматривает список найденных товаров" },
+                    { id: 4, name: "Применить фильтры", type: "decision", x: 650, y: 50, info: "Решает применить фильтры для уточнения результатов" },
+                    { id: 5, name: "Настройка фильтров", type: "normal", x: 650, y: 150, info: "Выбирает параметры фильтрации: цена, бренд, характеристики" },
+                    { id: 6, name: "Уточненные результаты", type: "normal", x: 450, y: 150, info: "Просматривает отфильтрованный список товаров" },
+                    { id: 7, name: "Выбор товара", type: "end", x: 250, y: 150, info: "Находит нужный товар и переходит к его просмотру" }
+                ],
+                connections: [
+                    { from: 1, to: 2 },
+                    { from: 2, to: 3 },
+                    { from: 3, to: 4 },
+                    { from: 4, to: 5, label: "Да" },
+                    { from: 4, to: 7, label: "Нет" },
+                    { from: 5, to: 6 },
+                    { from: 6, to: 7 }
+                ],
+                stats: { steps: 7, time: 2, clicks: 9, decisions: 1 }
+            }
+        };
+
+        // Функция для отображения выбранного User Flow
+        function showFlow(flowType) {
+            // Обновляем активную кнопку
+            document.querySelectorAll('.flow-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            const flow = flowData[flowType];
+            const diagram = document.getElementById('flowDiagram');
+            diagram.innerHTML = '';
+            
+            // Отрисовываем стрелки
+            flow.connections.forEach(conn => {
+                const fromStep = flow.steps.find(s => s.id === conn.from);
+                const toStep = flow.steps.find(s => s.id === conn.to);
+                
+                const arrow = document.createElement('div');
+                arrow.className = 'flow-arrow';
+                
+                const dx = toStep.x - fromStep.x;
+                const dy = toStep.y - fromStep.y;
+                const length = Math.sqrt(dx * dx + dy * dy);
+                const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                
+                arrow.style.width = length + 'px';
+                arrow.style.left = (fromStep.x + 70) + 'px';
+                arrow.style.top = (fromStep.y + 25) + 'px';
+                arrow.style.transform = `rotate(${angle}deg)`;
+                
+                diagram.appendChild(arrow);
+            });
+            
+            // Отрисовываем шаги
+            flow.steps.forEach(step => {
+                const stepElement = document.createElement('div');
+                stepElement.className = `flow-step ${step.type}`;
+                stepElement.style.left = step.x + 'px';
+                stepElement.style.top = step.y + 'px';
+                stepElement.textContent = step.name;
+                stepElement.onclick = () => {
+                    document.getElementById('stepInfo').textContent = step.info;
+                };
+                diagram.appendChild(stepElement);
+            });
+            
+            // Обновляем статистику
+            document.getElementById('stepsCount').textContent = flow.stats.steps;
+            document.getElementById('timeCount').textContent = flow.stats.time;
+            document.getElementById('clicksCount').textContent = flow.stats.clicks;
+            document.getElementById('decisionsCount').textContent = flow.stats.decisions;
+            
+            // Показываем информацию о первом шаге
+            document.getElementById('stepInfo').textContent = flow.steps[0].info;
+        }
+
+        // Инициализация - показываем первый flow
+        document.addEventListener('DOMContentLoaded', () => {
+            showFlow('purchase');
+        });
+    </script>
+</body>
+</html>
